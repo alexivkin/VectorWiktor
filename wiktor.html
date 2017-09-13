@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html dir="ltr" class="client-js" lang="en">
+[% FOR page IN pages %]
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    [% IF page.basename == "{SITE_URL}" or page.basename == "index" %]
+    <title>{SITE_TITLE}</title>
+    [% ELSE %]
+    <title>[% page.basename %]</title>
+    [% END %]
+    <meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/manifest.json">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+	<meta name="theme-color" content="#ffffff">
+    <link rel="copyright" href="http://creativecommons.org/licenses/by/3.0/">
+    <link rel="stylesheet" href="[% resource("wiktor.css") %]">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/3.0.2/tocbot.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/3.0.2/tocbot.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.1.1/lunr.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.5.0/highlight.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.5.0/languages/dos.min.js"></script>
+	<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.5.0/styles/github.min.css">
+
+	<script>hljs.initHighlightingOnLoad();</script>
+</head>
+[% options.line_breaks = 'remove' %]
+
+<body class="mediawiki ltr sitedir-ltr ns-0 skin-vector action-view vector-animateLayout">
+    <div id="mw-page-base" class="noprint"><span></span></div>
+    <div id="mw-head-base" class="noprint"><span></span></div>
+    <div id="content" class="mw-body" role="main">
+        <a id="top"></a>
+        <div id="mw-js-message" style="display:none;"></div>
+        [% IF page.basename != "index" %]
+        <h1 id="firstHeading" class="firstHeading" lang="en"><span dir="auto">
+		[% page.basename %]
+		</span></h1>
+	    [% END %]
+        <div id="bodyContent">
+            <div id="mw-content-text" dir="ltr" class="mw-content-ltr" lang="en">
+				[% IF page.basename == "Catalog" %]
+	                [% index(navigation.home,False) %]
+                [% ELSE %]
+                          <div class="js-toc"><span></span></div>
+                          <div class="js-toc-content">
+                          <!-- using content splitup instead of the whole page.content to add id to headers for the TOC to work -->
+                          <!-- these IDs are for TOC and they are lame but they work. ideally zim would provide a random function -->
+							[% FOR sub IN page.headings(3) %]
+								[% IF sub.level==1 and sub.heading!=None %]<h1 id="[% len(sub.content) %]1[% sub.content.count("e") %]">[% sub.heading %]</h1>[% END %]
+								[% IF sub.level==2 and sub.heading!=None %]<h2 id="[% len(sub.content) %]2[% sub.content.count("e") %]">[% sub.heading %]</h2>[% END %]
+								[% IF sub.level==3 and sub.heading!=None %]<h3 id="[% len(sub.content) %]3[% sub.content.count("e") %]">[% sub.heading %]</h3>[% END %]
+                            	[% sub.body %]
+							[% END %]
+                            <br><br>
+		            </div>
+                [% END %]
+				[% IF page.basename == "Troubleshooting" or page.basename == "How To" or page.basename == "Technical Notes" or page.basename == "Tools and Scripts" %]
+					[% index(page,False) %]
+                [% END %]
+            </div>
+            <br>
+            <div class="visualClear"><span></span></div>
+
+    [% IF page.basename != "404" %]
+		[% FOR link IN page.backlinks %]
+			[% IF loop.first %]<b>Backlinks:</b>[% END %]
+				<a href='[% uri(link) %]'>[% link.name %]</a>
+			[% IF loop.last %]<br /><br />[% END %]
+		[% END %]
+		[% FOR file IN page.attachments %]
+			[% IF loop.first %]
+				<b>Attachments:</b>
+				<table>
+			[% END %]
+				<tr><td><a href='[% uri(file) %]'>[% file.basename %]</a></td><td>&nbsp;</td><td>[% file.size %]</td></tr>
+    		[% IF loop.last %]
+			</table>
+			[% END %]
+		[% END %]
+	[% END %]
+
+        </div>
+        <div id="disqus_thread"><span></span></div>
+
+    </div>
+    <div id="mw-navigation">
+        <h2>Navigation menu</h2>
+        <div id="mw-head">
+            <div id="left-navigation">
+                <div id="p-namespaces" role="navigation" class="vectorTabs" aria-labelledby="p-namespaces-label">
+                    <h3 id="p-namespaces-label">Namespaces</h3>
+                    <ul>
+                        <li id="ca-nstab-main" class="selected"><span>Page</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div id="right-navigation">
+                <div id="p-views" role="navigation" class="vectorTabs" aria-labelledby="p-views-label">
+                    <h3 id="p-views-label">Views</h3>
+                    <ul>
+                        <li id="ca-view" class="selected"><span>Read</span></li>
+                        [% IF page.basename != "index" and page.basename != "Catalog" and page.basename != "404" and page.basename != "Catalog" and page.basename != "Troubleshooting" and page.basename != "How To" and page.basename != "Technical Notes" and page.basename != "Tools and Scripts" %]
+                        <li id="ca-edit"><span><a href="#disqus_thread">Comment</a></span></li>
+                        [% ELSE %]
+                        <li id="ca-edit"><span style="color: #aaa;">Comment</span></li>
+                        [% END %]
+                        <!--<li id="ca-history"><span>View history</span></li>-->
+                        <div id="p-search" role="search">
+                            <form action="https://www.google.com/search" method="GET" name="searchForm" id="searchForm" enctype="application/x-www-form-urlencoded" >
+
+							<div id="simpleSearch">
+							<input name="sitesearch" value="{SITE_URL}" type="hidden">
+                            <input id="searchInput" name="q" results="0" placeholder="Search {SITE_TITLE}..." title="Search {SITE_TITLE}..." tabindex="1" autocomplete="off" type="search">
+                            <input id="searchButton" name="go" value="Go" title="Go to a page with this exact name if it exists" class="searchButton" type="submit">
+							</div>
+
+							<div class="suggestions"><div class="suggestions-results"><span></span></div></div>
+                            </form>
+					    </div>
+
+                    </ul>
+                </div>
+                <div id="p-cactions" role="navigation" class="vectorMenu emptyPortlet" aria-labelledby="p-cactions-label">
+                    <h3 tabindex="0" id="p-cactions-label"><span>Actions</span><a tabindex="-1" href="#"></a></h3>
+                    <div class="menu">
+                        <ul>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="collapsible-nav" id="mw-panel">
+            <div id="p-logo" role="banner">
+                <a style="background-image: url([% resource("logo.png") %]);" href="[% uri("{SITE_URL}:index") %]" title="Visit the main page"><span></span></a>
+            </div>
+            <div class="portal first persistent" role="navigation" id="p-navigation" aria-labelledby="p-navigation-label">
+                <h3 id="p-navigation-label">Navigation</h3>
+                <div class="body">
+                    <ul>
+                        <li ><a href="[% uri("{SITE_URL}:index") %]">Main page</a></li>
+                        <li ><a href="[% uri("{SITE_URL}:How To") %]">How To</a></li>
+                        <li ><a href="[% uri("{SITE_URL}:Troubleshooting") %]">Troubleshoting</a></li>
+                        <li ><a href="[% uri("{SITE_URL}:Technical Notes") %]">Technical Notes</a></li>
+                        <li ><a href="[% uri("{SITE_URL}:Tools and Scripts") %]">Tools and Scripts</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="portal">
+            	<div style="display: block;" class="body">
+            		<ul id="p-tb-list">
+                        <li><a href="[% uri("{SITE_URL}:Catalog") %]" title="Index">Index</a></li>
+                        <li><a href="[% uri("{SITE_URL}:About") %]" title="About">About</a></li>
+                        <li><a href="[% uri("{SITE_URL}:Contact Info") %]" title="Contact Info">Contact Info</a></li>
+            		</ul>
+            	</div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" role="contentinfo">
+        <ul id="footer-places">
+            <li id="footer-places-about"><a href="[% uri(":{SITE_URL}:About") %]" title="About">About KnowWiki</a></li>
+            <li id="footer-places-disclaimer"><a href="[% uri(":{SITE_URL}:General_disclaimer") %]" title="General disclaimer">Disclaimers</a></li>
+            <li id="footer-info-copyright">Content is available under <a class="external" rel="nofollow" href="http://creativecommons.org/licenses/by/3.0/">Attribution 3.0 Unported</a> unless otherwise noted.</li>
+        </ul>
+		<ul id="footer-icons" class="noprint">
+				<li id="footer-copyrightico">
+					<a href="http://creativecommons.org/licenses/by/3.0/"><img src="[% resource("ccby_88x31.png") %]" alt="Attribution 3.0 Unported" height="31" width="88"></a>
+			</li>
+		</ul>
+    </div>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', '{GOOGLE_ANALYTICS_ID}', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+<script>
+$(document).ready(function () {
+    'use strict';
+    /* Set up search */
+    $.getJSON('/searchIndex.json', function (response) {
+	    var index, store;
+        // Create index
+        index = lunr.Index.load(response.index);
+        // Create store
+        store = response.store;
+        // Handle search
+        $('input#searchInput').on('keyup', function () {
+            // Get query
+            var query = $(this).val();
+            // Search for it
+            var resultdiv = $('div.suggestions');
+            if(query === ''){
+                /*resultdiv.empty();*/
+                resultdiv.hide();
+            }
+            else {
+                var result = index.search(query);
+                // Output it
+                if (result.length === 0) {
+                    // Hide results
+                    resultdiv.hide();
+                } else {
+                    // Show results
+                    var subresultdiv=$('div.suggestions-results')
+                    subresultdiv.empty();
+                    for (var item in result) {
+                        var ref = result[item].ref;
+                        var searchitem = '<a class="mw-searchSuggest-link" href="' + ref + '"><div class="suggestions-result">' + store[ref].title + '</div></a>';
+                        subresultdiv.append(searchitem);
+                    }
+                    resultdiv.show();
+                }
+            }
+        });
+    });
+	[% IF page.basename != "index" and page.basename != "Catalog" and page.basename != "404" and page.basename != "Catalog" and page.basename != "Troubleshooting" and page.basename != "How To" and page.basename != "Technical Notes" and page.basename != "Tools and Scripts" %]
+	tocbot.init({
+  		tocSelector: '.js-toc',
+  		contentSelector: '.js-toc-content',
+  		headingSelector: 'h1, h2, h3',
+	});
+	[% END %]
+});
+/* autohide search box */
+$(document).mouseup(function(e) {
+    var container = $("div.suggestions");
+    if (!container.is(e.target) && container.has(e.target).length === 0) {
+        container.hide();
+    }
+    var searchbox = $('div#p-search');
+    if (searchbox.is(e.target) || searchbox.has(e.target).length !== 0) {
+        container.show();
+    }
+});
+
+[% IF page.basename != "index" and page.basename != "Catalog" and page.basename != "404" and page.basename != "Catalog" and page.basename != "Troubleshooting" and page.basename != "How To" and page.basename != "Technical Notes" and page.basename != "Tools and Scripts" %]
+/*  disqus */
+[% SET n1=page.name.replace(":","/") %]
+[% SET n2=n1.replace(" ","_") %]
+[% SET n3=n2.replace("{SITE_URL}/","") %]
+
+var disqus_config = function () {
+	this.page.url = "http://{SITE_URL}/[% n3 %].html-1";
+	this.page.identifier = "[% n3 %]-1";
+};
+
+(function() { var d = document, s = d.createElement('script'); s.src = 'https://{DISQUS_URL}/embed.js'; s.setAttribute('data-timestamp', +new Date()); (d.head || d.body).appendChild(s); })();
+[% END %]
+
+</script>
+<noscript>Please enable JavaScript to get search, toc, comments and other stuff.</noscript>
+</body>
+[% END %]
+</html>
